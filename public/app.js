@@ -438,6 +438,15 @@ async function sendChat(question) {
       body: JSON.stringify({ question, region_code: currentRegion?.code }),
     });
     const data = await res.json();
+    if (!res.ok) {
+      const msg = data.error === 'query too long'
+        ? '질문이 너무 깁니다 (500자 이하로 줄여 주세요).'
+        : data.error === 'query is required'
+        ? '질문을 입력해 주세요.'
+        : `오류가 발생했습니다 (${data.code || res.status}).`;
+      appendMsg('bot', `⚠️ ${msg}`);
+      return;
+    }
     const latencyMs = Date.now() - t0;
 
     document.getElementById(loadId)?.remove();
